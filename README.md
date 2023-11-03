@@ -1,2 +1,61 @@
-# Practice
-# Practice
+# Breast Cancer Classification With K-Fold Cross Validation Sampling 
+ 
+#### Abstract— According to the World Health Organization, breast cancer is the world’s mostly commonly diagnosed cancer as of 2021, accounting for 12% of all new annual cancer cases worldwide [1]. In breast cancer, a mutation in the cell division process causes an overgrowth in cancerous cells forming a lump. However, breast lumps do not mean cancer in all cases. Some of the lumps can be benign. Benign lumps reach a limit in size and do not spread to other parts of the body. On the contrary, malignant lumps can spread to the lymph nodes and other body tissues in advanced cases. Early prediction of breast cancer can make a significant impact on treatment approaches and patient’s lifestyle. This project uses machine learning algorithms to predict breast cancer. The model classifies whether a patient's tumor is malignant or benign. Since this prediction is critical to a patient’s life, high accuracy of machine and minimal number of false negatives are crucial.  
+
+### Introduction
+Dataset is obtained from the UCI machine learning repository. It originates from University of Wisconsin Hospitals, Madison from Dr. William H. Wolberg. He assessed biopsies of breast tumors for 699 patients up to 15 July 1992 [2]. The dataset includes a total of 699 instances and 10 descriptive features and one target feature in which 2 represents benign and 4 is malignant. Nine attributes are discrete where they are scored on a scale of 1 to 10. The first attribute is the patient ID number. The second attribute is the clump thickness, which is a known measurement for biopsies from patients. Due to the variation of uniformity of a cancer cell size and shape, these two attributes play an important role in classifying the type of cell. Single epithelial cell size may also be important feature, since “most breast cancers originate in the epithelial cells lining breast ducts [3]. Moreover, adhesion proteins may act as key regulators of breast cancer initiation and progression, thus the importance of the ‘marginal adhesion’ feature in this data [3]. Other variables are related to the nucleus of the cell and its division. Since the target feature is a binary attribute, classification machine learning algorithms are implemented to classify cancerous cells from noncancerous ones.
+
+### Related Publications
+According to Liu et al, SVM has some advantages over the other techniques of converging to the global optimum and not to a local optimum [4]. In the publication, SVM is the classification method implemented to predict breast cancer. The method is coupled with Principal Component Analysis (PCA) as a dimensionality reduction technique to reduce computational workload and time consumption. Additionally, Liu et al utilized Leave One Out method (LOO) method to split the dataset to testing and training Leave-one-out cross validation is an extreme form of k-fold cross validation in which the number of folds is the same as the number of training instances. This means that each fold of the test set contains only one instance, and the training set contains the remainder of the data. Leave-one-out cross validation is useful when the amount of data available is too
+small to allow big enough training sets in a k-fold cross validation.
+
+### New Method
+Due to the importance of classification with least error, I decided to broaden the spectrum and apply multiple machine learning algorithms on the given dataset. This can be considered an exhaustive approach to attain highest accuracy possible. In addition to SVM, K-Nearest Neighbor (KNN), Decision Trees (DT), and Random Forests (RF) are implemented. As for the data splitting k-fold cross validation technique is applied since the dataset is large enough to be trained using this method. K-fold cross validation is a faster approach than LOO. This will be the tradeoff between applying multiple machine learning models and the method of model training. As for feature selection techniques, multiple techniques are applied to cross validate the results of each technique against the other.   
+
+### Implementaion - Data Exploration
+Data exploration starts with removing duplicate rows to end up with 691 instances to explore. A data quality report is created to explore the quality of the data and show if any missing values occur. There are 2.3% missing values in the “Bare Nuclei” feature. Since the data features are discrete, only the cardinality, mode(s), and mode frequencies are calculated. Then data is visualized using bar charts. A separate bar chart is created to visualize the number of patients with benign tumors versus malignant ones. About a third of the patients have malignant tumors.  Additionally, data correlation is visualized to show which features correlate the most with the target feature. Even though correlation is not causation; however, it is an indication of how the change in such features is correlated with the class. Correlation values are mostly above 0.7 which shows strong positive correlation between most descriptive features and target. 
+
+###### Plot 1. Spearman Correlation
+ <img src="https://github.com/Haninrefai/Breast-Cancer-Prediction/assets/89818668/bbcb4404-a0cc-469c-8e7a-33f69e90d340" width="650" height="400">
+
+Handling missing values is essential in this step. “Bare Nuclei” feature that includes missing values has a mode of one. Thus, one was used to fill missing values. Additionally, data frame columns are casted as numerical before feeding data to any machine learning models, especially that KNN and SVM accept numerical data. Also, for those two models, data features are scaled using min-max scaling to set the range of the data between 0 and 1.
+ 
+a_i^'=  (a_i-min⁡(a))/(max⁡(a)-min⁡(a))×(high-low)+low
+
+### Implementation - Feature Selection
+Two feature selection methods are applied, Mutual Information and Extra Tree Classifiers. Mutual Information is a filter feature selection method used to validate correlation calculations in this case. It ranks features according to their score values and selects the ones with the highest scores. One of the major advantages of filter feature selection is the computational and statistical scalability. Mutual information measures the random dependency between two variables in a dataset using joint and marginal density functions. 
+
+∑_(y∈Y)▒∑_(x∈X)▒〖p(x,y)log⁡((p(x,y))/(p_1 (x) p_2 (y))) 〗
+
+Extra Tree Classifier is an ensemble method used in this project to verify the results of feature selection. This class implements a meta estimator that fits several randomized decision trees (a.k.a. extra-trees) on various sub-samples of the dataset and uses averaging to improve the predictive accuracy and control over-fitting [4]. 
+Both feature selection methods reflect similar results in which they gave importance to specific attributes more than the others. Therefore, Uniformity of Cell Size, Uniformity of Cell Shape, Bare Nuclei, Bland Chromatin, and Normal Nucleoli are the selected features. 
+
+### K-Fold Cross Validation
+Based on the bar chart of the target feature, it is evident that the number of patients with malignant tumors is minimal compared to patients with benign tumors. Considering the distribution of the data and to avoid lucky splits K-Fold cross validation is used to split the data, instead of the holdout data split method. Data is divided into k equal-sized folds (or partitions), and k separate evaluation experiments are performed. The method is applied with random state 1 is and models are evaluated based on 5 folds. There is an accuracy evaluation at each fold and an average is calculated at the end to result in an average accuracy as a metric to measure overall model performance. 
+Results and Performance Analysis
+SVM is the first machine learning model applied to the 5 folds of datasets. SVM parameters are set to default which uses Radial Basis Function (RBF) as a kernel function, and C = 1. SVM’s average accuracy is 95.81%, while it scored 95.24% with the same parameters in Liu et al study. KNN accuracy score averaged at a slightly lower rate of 95.37%. Decision Tree Classifier is applied with the Gini criterion, and it scored an average of 93.78%. Lastly, Random Forest achieved 96.53% which is the highest of all. Based on University of California (UCI), where the data was obtained from, the maximum accuracy achieved on this dataset is 96.57%. Random Forest in this project score is very close to that of UCI with a 0.04% of a difference. It is not a major difference, yet the poorer performance can be a cause of the choice of features that may introduce bias or model variations.
+A neural network is also applied and evaluated using Binary Accuracy. NN scored 93.89%. A minimal difference between neural network’s performance that of decision tree. It is not an impressive performance for a neural network. Yet, RF stays the top performer of all.
+
+### Implementation - Hyper-Parameter Tuning
+In efforts to attain higher accuracy, a grid search is implemented for each machine learning model. A grid search is an exhaustive search over specified parameter values for an estimator [6]. It is used to tune the parameters of machine learning models to find their optimal hyperparameters that can attain highest accuracy possible. To apply grid search, a different approach in data split must be applied. The dataset is split into 2/3 as training set, and 1/3 as testing set. Grid search method. A dictionary with possible parameters for each model is created and fed into the scikit-learn GridSearchCV method. Even though the optimal value of C in Liu et al study was 100, GridSearchCV chose C = 1 as the optimized parameter for SVM. C is a regularization parameter that controls the tradeoff between achieving a low training error and a low testing error, that is the ability to generalize your classifier to unseen data. The accuracy after parameter tuning is 96.51%, which is a lower performance than accuracy with k-fold cross validation method and lower than that of Liu et al. For KNN, the tuned parameters are the number of neighbors “n-neighbors’, and ‘p’ which represents type of Minkowski distance. The tuned parameters are n-neighbors = 15, and p = 3. The tuned KNN achieved 93%, which is worse than that with k-fold cross validation.
+
+Minkowski (a,b)=(∑_(i=1)^m▒〖〖abs(a[i]-b[i])〗^p  〗)^(1/p)
+
+On the other hand, the tuned DT parameters are entropy as the criterion, maximum depth of 6, 2 maximum features, 2 minimum samples per, and a random state of 50. Maximum accuracy achieved by DT through grid searching is 93.45%, which slightly lower than accuracy with k-fold cross validation method.
+
+### Conclusion and Possible Future Improvements  
+Overall, the top performance is achieved by RF classifier, which resembles the results on UCI with a minimal difference. While SVM scored a lower accuracy, it is the second-best classifier of all. As a result, implementing various machine learning algorithms gave a clear picture of the model to be chosen to improve in the future. Since RF outperformed SVM, deeper parameter tuning can be applied to improve SVM. Also, using Principal Component Analysis (PCA) as a dimensionality reduction technique is a possible method to improve RF performances. In fact, PCA may reduce the possible introduction of bias through manual feature selection based on rankings. 
+
+### References
+[1] World Health Organization. 2021, February 3. Breast cancer now most common form of cancer: WHO taking. Retrieved December 9, 2022 from https://www.who.int/news/item/03-02-2021-breast-cancer-now-most-common-form-of-cancer-who-taking-action#:~:text=The%20global%20cancer%20landscape%20is,(IARC)%20in%20December%202020.
+
+[2] University of California Irvine Machine Learning Repository. 2022. Breast Cancer Data. Retrieved December 9, 2022 from https://archivebeta.ics.uci.edu/dataset/15/breast+cancer+wisconsin+original.
+
+[3] McSherry, E.A., Brennan, K., Hudson, L. et al. 2011. Breast cancer cell migration is regulated through junctional adhesion molecule-A-mediated activation of Rap1GTPase. Breast Cancer Res 13, R31. https://doi.org/10.1186/bcr2853 .
+
+[4] H. X. Liu, R. S. Zhang, F. Luan, X. J. Yao, M. C. Liu, Z. D. Hu, and B. T. Fan.  2003. Journal of Chemical Information and Computer Sciences.43 (3), 900-907. DOI: 10.1021/ci0256438
+
+[5] Scikit Learn Machine Learning in Python. (n.d.). Extra Trees Classifier. Retrieved December 9, 2022 from https://scikit-learn.org/stable/index.html
+
+ 
+
